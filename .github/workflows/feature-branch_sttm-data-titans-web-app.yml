@@ -1,71 +1,53 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
-
-name: Build and deploy Python app to Azure Web App - sttm-data-titans-web-app
+# Workflow to Deploy a Python App to Azure Web App Without GitHub Secrets
+name: Build and deploy Streamlit app to Azure Web App - sttm-data-titans-web-app
 
 on:
   push:
     branches:
-      - feature-branch
-  workflow_dispatch:
+      - feature-branch # Trigger workflow on push to the feature branch
+  workflow_dispatch: # Allow manual triggering of the workflow
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read #This is required for actions/checkout
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python version
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-
-      - name: Create and start virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-      
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-        
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-app
-          path: |
-            .
-            !venv/
-
   deploy:
     runs-on: ubuntu-latest
-    needs: build
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write # Required for Azure login
+      contents: read # Required for actions/checkout
 
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
+      # Step 1: Checkout the source code
+      - name: Checkout the code repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          name: python-app
-      
+          python-version: "3.10"
+
+      # Step 3: Install the required dependencies
+      - name: Install dependencies from requirements.txt
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Step 4: Login to Azure using inline Publish Profile
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_4135829618084AB9A9F66F77C113560A }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_0DF12844FD1F4843B4EA04BEB38B0DDB }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_BDA819118C914751A8B4E1405BA9B93E }}
+          publish-profile: |
+            <?xml version="1.0" encoding="utf-8"?>
+            <publishData>
+              <publishProfile
+                profileName="sttm-data-titans-web-app - Azure Web App"
+                publishMethod="MSDeploy"
+                ...  <!-- Entire Publish Profile content -->
+              />
+            </publishData>
 
-      - name: 'Deploy to Azure Web App'
+      # Step 5: Deploy the application to Azure Web App
+      - name: Deploy the Streamlit app to Azure Web App
         uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
         with:
-          app-name: 'sttm-data-titans-web-app'
-          slot-name: 'Production'
-          
+          app-name: 'sttm-data-titans-web-app' # Replace with your actual Azure App name
+          slot-name: 'production' # Replace if you're using a specific deployment slot
