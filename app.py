@@ -53,22 +53,22 @@ logger.debug("Streamlit app title set.")
 user_input = st.text_input("Enter your question:", placeholder="What is the capital of India?")
 logger.debug(f"User Input: {user_input}")
 
-# Button to invoke AzureChatOpenAI
 if st.button("Get Answer"):
     logger.info("Get Answer button pressed.")
     if user_input.strip():
         try:
             # Log user input
             logger.info(f"Invoking Azure OpenAI with user input: {user_input}")
-            print(f"[DEBUG] User Input: {user_input}")
 
             # Pass user input to AzureChatOpenAI
-            response = epam_dial.invoke(user_input)  # Call Azure OpenAI
-            logger.info(f"Azure OpenAI Response: {response.content}")
-            print(f"[DEBUG] Azure OpenAI Response: {response.content}")
+            response = epam_dial.invoke(user_input)  # Call Azure OpenAI API
+            
+            # Validate the response object
+            logger.info(f"Raw response object: {response}")
+            print(f"[DEBUG] Raw response object: {response}")
 
-            # Display the AI response
-            st.success("Answer: " + response.content)
+            # Display the parsed response content
+            st.success(f"Answer: {response.content}")
         except Exception as e:
             error_message = f"An error occurred during API invocation: {str(e)}"
             logger.error(error_message)
