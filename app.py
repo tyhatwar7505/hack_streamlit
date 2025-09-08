@@ -4,7 +4,7 @@ import os
 
 load_dotenv()
 
-API_KEY = os.environ.get("EPAM_DIAL_KEY")
+API_KEY = "dial-m12nz8lbct9y8rgvholhpr2dhwb"
 AZURE_MODEL = "gpt-4o-mini-2024-07-18"
 
 epam_dial = AzureChatOpenAI(
