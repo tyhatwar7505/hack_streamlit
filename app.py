@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 logger.debug("Environment variables loaded successfully.")
 
-# Configuration for Azure OpenAI in python
+# Configuration for Azure OpenAI in python test
 API_KEY = os.getenv("EPAM_DIAL_KEY", "dial-m12nz8lbct9y8rgvholhpr2dhwb")  # Default in case env variable fails
 logger.debug(f"Using API Key: {API_KEY}")
 AZURE_MODEL = "gpt-4o-mini-2024-07-18"
